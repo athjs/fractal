@@ -1,5 +1,6 @@
 #include "SFML/Graphics.hpp"
 #include <complex>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <ostream>
@@ -23,6 +24,7 @@ std::vector<double> linspace(double start, double end, std::size_t num) {
   }
   return result;
 }
+
 int convergence(std::complex<double> c) {
   int i(0);
   std::complex<double> z(0);
@@ -35,10 +37,10 @@ int convergence(std::complex<double> c) {
   return MAX_ITERATION;
 }
 
-std::vector<std::vector<int> > fulfill(int rows, std::vector<double> real,
+std::vector<std::vector<int>> fulfill(int rows, std::vector<double> real,
                                       std::vector<double> imaginary) {
   std::complex<double> z1;
-  std::vector<std::vector<int> > matrix(rows);
+  std::vector<std::vector<int>> matrix(rows);
   for (int i = 0; i < rows; ++i) {
     matrix[i].resize(rows);
     for (int j = 0; j < rows; j++) {
@@ -50,10 +52,28 @@ std::vector<std::vector<int> > fulfill(int rows, std::vector<double> real,
 }
 
 int main() {
-  std::vector<double> real = linspace(-2, 2, 5000);
-  std::vector<double> imaginary = linspace(-2, 2, 5000);
-  std::vector<std::vector<int> > matrix = fulfill(5000, real, imaginary);
-  std::cout << matrix[500][500] << std::endl;
-  sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
+  std::vector<double> real = linspace(
+      -2, 2, 500); // Réduit le nombre de points pour un affichage plus rapide
+  std::vector<double> imaginary = linspace(-2, 2, 500);
+  std::vector<std::vector<int>> matrix = fulfill(500, real, imaginary);
+
+  sf::RenderWindow window(sf::VideoMode({200, 200}), "SFML works!");
+  sf::CircleShape shape(100.f);
+  shape.setFillColor(sf::Color::Green);
+
+  while (window.isOpen()) {
+    while (const std::optional event = window.pollEvent()) {
+      if (event->is<sf::Event::Closed>())
+        window.close();
+      else if (sf::Event::KeyPressed) {
+        if (event.key.code == sf::Keyboard::Escape)
+          window.close();
+      };
+    }
+
+    window.clear();
+    window.draw(shape);
+    window.display();
+  }
   return EXIT_SUCCESS;
 }
